@@ -1,32 +1,48 @@
-import React, { Fragment } from 'react';
-import { Container, Row, Col } from 'reactstrap'
-import Header from '../Components/Header'
-import { Route, Switch } from 'react-router-dom'
-import route from '../route'
 
-function Layout() {
+import React, { Component } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-    return (
-        <Fragment>
-            <Header />
-            <Container>
-                <Row>
-                    <Col>
-                        <Switch>
-                            {route.map(page =>
-                            <Route path={page.path}
-                            exact={page.exact}
-                            component={page.Component}>
-                            </Route>
-                        )}
-                        </Switch>
-                    </Col>
-                </Row>
-            </Container>
-        </Fragment>
 
-    );
+class Layout extends Component {
 
+    constructor() {
+        super();
+        this.state = {
+            height: '182px', 
+            classNames : 'card bg-danger'
+        }
+    }
+    /**
+     * Calculate & Update state of new dimensions
+     */
+    updateDimensions = () =>  {
+        this.setState({ height: `${window.innerHeight}px` });
+    }
+
+    /**
+     * Add event listener
+     */
+    componentDidMount() {
+        this.updateDimensions();
+        window.addEventListener("resize", this.updateDimensions);
+    }
+
+    /**
+     * Remove event listener
+     */
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions);
+    } 
+
+    render() {
+        
+        return (
+            <div class="card" style={{ height: `${this.state.height}`,background: `${this.props.color}`}}>
+                <div class="card-body row justify-content-center align-items-center bg-">
+                    {this.props.children}
+                </div>
+            </div>
+        );
+    }
 }
-
-export default Layout;
+export default Layout
