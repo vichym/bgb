@@ -42,10 +42,6 @@ io.on('connection', socket => {
         }
     }))
 
-    /* Handle new client event */
-    socket.on("new_client", new_client => {
-        /* Add socket ID to client */
-        new_client['socketID'] = socket.id
-    })
+
 })
 
