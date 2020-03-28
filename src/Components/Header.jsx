@@ -11,6 +11,7 @@ import {
     NavbarToggler,
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import route from '../route'
 
 class Header extends Component {
 
@@ -35,12 +36,11 @@ class Header extends Component {
                     <NavbarToggler onClick={this.toggle} className="mr-2" />
                     <Collapse isOpen={this.state.isOpen} navbar>
                         <Nav className="mr-auto" navbar>
-                            <NavItem sm="4">
-                                <NavLink tag = {Link} to="/chatrooms">Chat Room</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink tag = {Link} to="/">Live Visitors</NavLink>
-                            </NavItem>
+                            {route.map(p =>
+                                <NavItem sm="4">
+                                    <NavLink tag={Link} to={p.path}>{p.name}</NavLink>
+                                </NavItem>)
+                            }
                         </Nav>
                     </Collapse>
                 </Navbar>
