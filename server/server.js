@@ -16,13 +16,6 @@ server.listen(PORT, () => {
     console.log(`listening on Port:${PORT}`);
 });
 
-/* Method to get a list of all active socketID */
-const getAllActiveSocketID = () => {
-    let conected_sockets = io.sockets.clients().connected
-    let sockets_list = Object.values(conected_sockets)
-    let clientsID_list = sockets_list.map(c => c.id)
-    return clientsID_list
-}
 
 /* Set up mongodb */
 mongodb.connect(`mongodb://${DOMAIN}:27017`, {
@@ -37,20 +30,7 @@ mongodb.connect(`mongodb://${DOMAIN}:27017`, {
     /* get collection from database */
     let Chat_Collection = client.db('chatapp').collection("Chat_Collection")
     let Client_Collention = client.db('chatapp').collection("Clients")
-    let Room_Collention = client.db('chatapp').collection("Rooms")
 
-    /* Fetch Updated data from database and emit to socket */
-    const fetchClientData = (socket) => {
-        Client_Collention.find({ socketID: { $in: getAllActiveSocketID() } }).sort({ "__id": 1 }).toArray((err, data) => {
-            if (err) {
-                console.error(err)
-            }
-            else {
-                /* emit fetched data to frontend through socket */
-                io.emit("all_clients", data)
-            }
-        })
-    }
     /* Set up socket connection */
     io.on('connection', socket => {
         var socketId = socket.id
@@ -61,8 +41,7 @@ mongodb.connect(`mongodb://${DOMAIN}:27017`, {
             /* Socket: Add user to chat room */
             socket.join(room)
             console.log(`${socketId} join ${room}`)
-        }
-        )
+        })
 
         /* Handle leave room event */
         socket.on("leave_room", (room) => {
@@ -97,15 +76,29 @@ mongodb.connect(`mongodb://${DOMAIN}:27017`, {
 
         /* Handle client disconnect event */
         socket.on("disconnect", (socket) => {
-
-            /* Remove disconnected client from database and update (emit) frontend */
-            Client_Collention.deleteOne({ socketID: socketId }).then(
-                /* Update frontend */
-                fetchClientData()
-            ).catch(err =>
-                /* Catch delete error message */
-                console.error(err))
         })
+
+        /* Handle join room event */
+        socket.on("join_room", (room) => {
+            /* Socket: Add user to chat room */
+            socket.join(room)
+            console.log(`${socketId} join ${room}`)
+        })
+
+        /* Handle leave room event */
+        socket.on("leave_room", (room) => {
+            /* Socket: Add user to chat room */
+            socket.leave(room)
+            console.log(`${socketId} leaves ${room}`)
+        })
+
+        /* Handle message input event */
+        socket.on("message", ((message, room) => {
+            if (message !== "" && room !== undefined) {
+                socket.to(room).emit("message", message)
+            }
+        }))
+
     });
 })
 
