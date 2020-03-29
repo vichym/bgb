@@ -8,7 +8,9 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      onlineUsers :[]
+      onlineUsers: [],
+      socket: {},
+      username: "Jack"
     }
   }
   // componentWillMount() {
@@ -16,18 +18,24 @@ class App extends Component {
   //     socket.on('all_clients', res => this.setState({ onlineUsers : res }))
   //   }
   // }
-  
+
+  /* Update function for Context provider */
+  updateState = (key, val) => {
+    this.setState({ [key]: val });
+  }
+
+
   render() {
     return (
       <Fragment>
-      <Context.Provider value={this.state.onlineUsers}>
-        <BrowserRouter>
-            <RouteHandler/>
-        </BrowserRouter>
-      </Context.Provider>
-    </Fragment>
-  );
-}
+        <Context.Provider value={{state: this.state, updateValue: this.updateState}}>
+          <BrowserRouter>
+            <RouteHandler />
+          </BrowserRouter>
+        </Context.Provider>
+      </Fragment>
+    );
+  }
 }
 
 export default App;
