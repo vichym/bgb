@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function NotFoundPage(props) {
     return (
-        <Layout color='rgba(237, 109, 109, 1)'>
+        <Layout color1='rgba(255, 0, 0, 0.938)' color2 = 'rgba(0, 0, 0, 0.938)'>
             <div >
                 <h2 className="d-flex justify-content-center" style={{ fontSize: '3rem' }}>
                     Page Not Found
