@@ -1,13 +1,16 @@
 import React, { Fragment } from 'react';
 import { Route, Switch } from 'react-router-dom'
-import Chatrooms from "../Components/Chatrooms"
 import LoginPage from "../Components/LoginPage"
-import  NotFoundPage from "../Components/404";
-const route = [
+import NotFoundPage from "../Components/404";
+import WelcomePage from '../Components/WelcomePage';
+import JoinGamePage from '../Components/JoinGamePage';
+
+const route = [ 
     { path: '/', exact: true, Component: LoginPage, name: "Login Page" },
-    { path: '/gamerooms', Component: Chatrooms, name: "Game Room" },
-    { path:"*", Component:  NotFoundPage  }
-    
+    { path: '/welcome', Component: WelcomePage, name: "Welcome Page" },
+    { path: '/joingame', Component: JoinGamePage, name: "Code Page" },
+    { path: "*", Component: NotFoundPage }
+
 ]
 
 const RouteHandler = () => {
