@@ -3,8 +3,7 @@ import Layout from '../Layout/Layout';
 import { Button, Row, Col, Input } from 'reactstrap';
 const JoinGamePage = (props)=> {
     return (
-        <Layout color1 = 'rgba(125, 238, 242, 1)' color2 = 'rgba(249, 193, 79, 1)' >
-        
+        <Layout color1 = 'rgba(125, 238, 242, 1)' color2 = 'rgba(61, 180, 255, 1)' classNames='col-10 col-sm-10 col-md-6 col-lg-4 col-xl-3 ' >
             <Row>
                 <Col>
                     <h3 className="d-flex justify-content-center " style={{ fontSize: '1.5rem' }}>Enter Game Code</h3>

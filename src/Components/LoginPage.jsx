@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';;
 const LoginPage = (props) => {
 
     return (
-        <Layout color1='rgba(249, 193, 79, 1)' color2 = 'rgba(61, 180, 255, 1)'>
+        <Layout color1='rgba(249, 193, 79, 1)' color2 = 'rgba(61, 180, 255, 1)' classNames='col-10 col-sm-10 col-md-6 col-lg-4 col-xl-3 ' >
             <Row>
                 <Col>
                     <h3 className="d-flex justify-content-center " style={{ fontSize: '2rem' }}>Chat APP</h3>

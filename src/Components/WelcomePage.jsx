@@ -7,7 +7,7 @@ import Context from '../Context';
 const  WelcomePageWithoutContext = (props) => {
     console.log(props.context)
     return (
-        <Layout color1='rgba(125, 238, 242, 1)' color2 = 'rgba(249, 193, 79, 1)'>
+        <Layout color1='rgba(125, 238, 242, 1)' color2 = 'rgba(249, 193, 79, 1)' classNames='col-10 col-sm-10 col-md-6 col-lg-4 col-xl-3 ' >
                 <Row>
                     <Col>
                         <h3 className="d-flex justify-content-center ">Welcome,</h3>
