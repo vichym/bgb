@@ -1,9 +1,10 @@
 
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Card, Media , Row, Col} from 'reactstrap'
+import { Card, Media, Row, Col } from 'reactstrap'
 import logo from '../Logo/BGB.png'
-
+import { route } from '../Layout/RounteHandler'
+import { Link } from 'react-router-dom';
 class Layout extends Component {
 
     constructor() {
@@ -38,9 +39,17 @@ class Layout extends Component {
     render() {
 
         return (
-            <div class="card" style={{ height: `${this.state.height}`, background: `${this.props.color1}` }}>
-                <div class="card-body row justify-content-center align-items-center">
-                    <Card body inverse style={{ background: `${this.props.color2}` }} className='col-10 col-sm-10 col-md-6 col-lg-4 col-xl-3 '>
+            <div className="card" style={{ height: `${this.state.height}`, background: `${this.props.color1}` }}>
+                {/* Debugging */}    
+                <Row className="align-items-center">
+                        {route.map(r => 
+                            <Col>
+                                <Link to={r.path}>{r.name}</Link>
+                            </Col>)}
+                </Row>
+                {/* Debugging */}
+                <div className="card-body row justify-content-center align-items-center">
+                    <Card body inverse style={{ background: `${this.props.color2}` }} className=   {this.props.classNames}>
                         <Row>
                             <Col>
                                 <Media left top width="50" className="rounded mx-auto d-block" src={logo} />
