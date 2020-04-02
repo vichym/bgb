@@ -1,16 +1,17 @@
 
-import React, { Component } from 'react';
+import React, { Component, Fragment , memo} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card, Media, Row, Col } from 'reactstrap'
 import logo from '../Logo/BGB.png'
 import { route } from '../Layout/RounteHandler'
 import { Link } from 'react-router-dom';
+
 class Layout extends Component {
 
     constructor() {
         super();
         this.state = {
-            height: '182px',
+            height: '',
             classNames: 'card bg-danger'
         }
     }
@@ -39,17 +40,15 @@ class Layout extends Component {
     render() {
 
         return (
-            <div className="card" style={{ height: `${this.state.height}`, background: `${this.props.color1}` }}>
-                {/* Debugging */}    
+            <Fragment>
                 <Row className="align-items-center">
-                        {route.map(r => 
-                            <Col>
-                                <Link to={r.path}>{r.name}</Link>
-                            </Col>)}
+                    {route.map(r =>
+                        <Col>
+                            <Link to={r.path}>{r.name}</Link>
+                        </Col>)}
                 </Row>
-                {/* Debugging */}
-                <div className="card-body row justify-content-center align-items-center">
-                    <Card body inverse style={{ background: `${this.props.color2}` }} className=   {this.props.classNames}>
+                <div className=" row justify-content-center align-items-center" style={{ height: `${this.state.height}`, background: `${this.props.color1}` }}>
+                    <Card body inverse style={{ background: `${this.props.color2}` }} className={this.props.classNames}>
                         <Row>
                             <Col>
                                 <Media left top width="50" className="rounded mx-auto d-block" src={logo} />
@@ -57,11 +56,12 @@ class Layout extends Component {
                         </Row>
                         {this.props.children}
                     </Card>
+                    {/* </div> */}
                 </div>
-            </div>
+            </Fragment>
         );
     }
 
 }
 
-export default Layout
+export default memo(Layout)
