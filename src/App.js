@@ -8,9 +8,20 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      onlineUsers: [],
+      players: [
+        {name: "Jonh"},
+        {name: "Jack"},
+        {name: "Jerk"},
+        {name: "Jelly"},
+      ],
       socket: {},
-      username: "Jack"
+      username: "Jackson",
+      asset: [
+        { name: "Gold", amount:1000 },
+        { name: "Silver", amount:600 },
+        { name: "Brone", amount:10 },
+        { name: "Diamond", amount:10 },
+      ]
     }
   }
   // componentWillMount() {
@@ -23,7 +34,6 @@ class App extends Component {
   updateState = (key, val) => {
     this.setState({ [key]: val });
   }
-
 
   render() {
     return (
