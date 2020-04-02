@@ -5,14 +5,15 @@ import NotFoundPage from "../Components/404";
 import WelcomePage from '../Components/WelcomePage';
 import JoinGamePage from '../Components/JoinGamePage';
 import CreateGamePage from '../Components/CreateGamePage';
+import DashboardPage from '../Components/DashboardPage/DashboardPage';
 
 export const route = [ 
     { path: '/', exact: true, Component: LoginPage, name: "Login Page" },
     { path: '/welcome', Component: WelcomePage, name: "Welcome Page" },
     { path: '/joingame', Component: JoinGamePage, name: "Join Game Page" },
     { path: '/creategame', Component: CreateGamePage, name: "Create Game Page" },
+    { path: '/dashboard', Component: DashboardPage, name: "Dashboard Page" },
     { path: "*", Component: NotFoundPage }
-
 ]
 
 const RouteHandler = () => {
