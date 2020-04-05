@@ -1,44 +1,30 @@
 import React, { Fragment, Component } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Context from './Context'
+import socket from './socket'
 import RouteHandler from './Layout/RounteHandler';
 
-class App extends Component {
 
-  constructor() {
-    super()
+class App extends Component {
+  constructor(props) {
+    super(props)
+
     this.state = {
-      players: [
-        {name: "Jonh"},
-        {name: "Jack"},
-        {name: "Jerk"},
-        {name: "Jelly"},
-      ],
-      socket: {},
-      username: "Jackson",
-      asset: [
-        { name: "Gold", amount:1000 },
-        { name: "Silver", amount:600 },
-        { name: "Brone", amount:10 },
-        { name: "Diamond", amount:10 },
-      ]
+      username: "",
+      gameCode: "",
     }
   }
-  // componentWillMount() {
-  //     socket.emit("new_client", client)
-  //     socket.on('all_clients', res => this.setState({ onlineUsers : res }))
-  //   }
-  // }
-
-  /* Update function for Context provider */
-  updateState = (key, val) => {
-    this.setState({ [key]: val });
+  componentWillMount() {
+    socket.on("join_game_success", ({ message }) => {
+      this.setState({ joinStatus: true })
+      console.log("join_game_success")
+    })
   }
 
   render() {
     return (
       <Fragment>
-        <Context.Provider value={{state: this.state, updateValue: this.updateState}}>
+        <Context.Provider value={{ app: this }}>
           <BrowserRouter>
             <RouteHandler />
           </BrowserRouter>
