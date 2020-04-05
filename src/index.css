@@ -9,4 +9,12 @@ body {
     -moz-osx-font-smoothing: grayscale;
   }
   
+#app-title{
+  color: aliceblue;
+}
   
+input{  
+  text-align: center;
+} 
+
+
