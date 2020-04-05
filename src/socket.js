@@ -1,6 +1,9 @@
 import openSocket from 'socket.io-client'
-const PORT = 5000
+const URL = "http://localhost"
+const PORT = "5000"
 
-const socket = openSocket(`http://localhost:${PORT}`)
+export const url = `${URL}:${PORT}`
+
+const socket = openSocket(`${url}`)
 export default socket
 
