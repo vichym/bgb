@@ -1,5 +1,6 @@
 import React from 'react';
-import {  Card, CardBody, CardHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader } from 'reactstrap';
+
 
 function Log(props) {
     return (
@@ -8,13 +9,16 @@ function Log(props) {
                 Log
             </CardHeader>
             <CardBody className=" justify-content-center bg-dark p-3">
-                <div className="bg-white h-100vh rounded" style={{height:"10vh"}}>
+                <div id="log-div" className="bg-white rounded container">
                     {/* For rendering all message */}
-
+                    {props.log.map(msg =>
+                            <div id="log-text">{msg.message}</div>
+                    )}
                 </div>
             </CardBody>
         </Card>
     );
+
 }
 
 export default Log;
