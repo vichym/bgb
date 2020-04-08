@@ -11,7 +11,7 @@ function InputAmount(props) {
     return (
         <ButtonGroup className="m-2 d-flex align-items-center">
             <Button className="align-self-stretch m-1" onClick={decrement}>-</Button>
-            <Input type="number" name="amount" onChange={props.updateValue} value={props.amount} autoComplete placeholder="specify amount" />
+            <Input type="number" name="amount" autoComplete="true" onChange={props.updateValue} value={props.amount} autoComplete placeholder="specify amount" />
             <Button className="align-self-stretch m-1" onClick={increment}>+</Button>
         </ButtonGroup>
     );
