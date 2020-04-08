@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import Layout from '../Layout/Layout';
-import { Button, Row, Col, Input, Modal, ModalBody } from 'reactstrap';
-import Context from '../Context';
-import { url } from '../socket'
+import Layout from '../Layout';
+import { Button, Row, Col, Input } from 'reactstrap';
+import Context from '../../Context';
+import socket, { url } from '../../socket'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
+import InfoModal from './Modal';
 
 
 const JoinGamePageWithoutContext = (props) => {
 
-    /* Declare a new state variable for modal */
-    const [openModal, setOpenModal] = useState(true);
-    const toggle = () => setOpenModal(!openModal);
-
     /* Utilize context from App.js */
     const { app } = props.context
-    const { gameCode } = app.state
+    const { gameCode, username } = app.state
 
     /* Initialize history for redirecting route */
     const history = useHistory()
+
+    const [codeErrorModal, setCodeErrorModal] = useState(false);
+    const [joinErrorModal, setJoinErrorModal] = useState(false);
 
 
     /* Set update username but setState App.js and */
@@ -43,16 +43,29 @@ const JoinGamePageWithoutContext = (props) => {
             .then(
                 /* redirct page to Dashboard or show error modal  */
                 res => {
-                    if (!res.data.message) {
-                        history.push("/dashboard");
-                    } else {
-                        return setOpenModal(true)
+                    /* if the game is found */
+                    if (res.data.isFound) {
+                        /* SOCKET: emit "new_client" */
+                        socket.emit("join_game", { username, gameCode })
+                        socket.on("join_game_resp", ({ message, success }) => {
+                            if (success) {
+                                /* redirect to Dashbaord */
+                                history.push("/dashboard");
+                            } else {
+                                /* Show error join error modal */
+                                console.log(message)
+                                setJoinErrorModal(true)
+                            }
+                        })
+                    }
+                    /* If game not found */
+                    else {
+                        return setCodeErrorModal(true)
                     }
                 })
     }
 
     return (
-
         <Layout color1='rgba(125, 238, 242, 1)' color2='rgba(61, 180, 255, 1)' classNames='col-10 col-sm-10 col-md-6 col-lg-4 col-xl-3 ' >
             <Row>
                 <Col>
@@ -65,15 +78,23 @@ const JoinGamePageWithoutContext = (props) => {
                     <Button className="w-100 m-1" color="success" disabled={!app.state.gameCode} onClick={handleSubmit} >Join</Button>
                 </Col>
             </Row>
-            <Modal centered size={'sm'} isOpen={openModal} toggle={toggle} >
-                <ModalBody className="text-center">
-                    <h4>
-                        <b>Game Not Found</b>
-                    </h4>
-                    <p>Please double check your code</p>
-                    <Button color="primary" onClick={toggle}>Okay</Button>
-                </ModalBody>
-            </Modal>
+            {
+                /* Show Info Modal if join fail */
+                joinErrorModal && <InfoModal
+                    msg="There is an error joining the game room. Please try again"
+                    title="Join Room Failed"
+                    toggle={() => setJoinErrorModal(false)}
+                    isOpen={joinErrorModal}
+                />
+            }
+            {
+                /* Show Info Modal if code error */
+                codeErrorModal && <InfoModal
+                    msg="There is game found! Please Check your code."
+                    title="Game Not Found"
+                    toggle={() => setCodeErrorModal(false)}
+                    isOpen={codeErrorModal} />
+            }
         </Layout>
     );
 }
