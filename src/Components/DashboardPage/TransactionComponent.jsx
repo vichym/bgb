@@ -3,15 +3,12 @@ import { ButtonGroup, Button, Card, CardHeader, CardBody } from 'reactstrap'
 import { Component } from 'react';
 import InputAmount from './InputAmount';
 
-class PlayerListComponent extends Component {
+class TransactionComponent extends Component {
 
     state = {
         recipient: "",
         amount: ""
     }
-
-    players = this.props.players
-    asset = this.props.asset
 
     /* Change the state in Dashboard Page onChange event*/
     onSetValue = (e) => {
@@ -20,10 +17,12 @@ class PlayerListComponent extends Component {
         console.log(e.target.name, e.target.value)
     }
 
+
     /* Generate player buttons for transaction */
     rendPlayerList = () => {
+        let players = this.props.players
         const items = []
-        this.players.map(p =>
+        players.map(p =>
             items.push(
                 <Button color="primary"
                     className="border border-success rounded p-1"
@@ -40,8 +39,9 @@ class PlayerListComponent extends Component {
 
     /* Generate Assets buttons */
     rendAssetList = () => {
+        let asset = this.props.asset
         const items = []
-        this.asset.map(p =>
+        asset.map(p =>
             items.push(
                 <Button color="warning "
                     className="m-1 border border-danger rounded"
@@ -58,27 +58,27 @@ class PlayerListComponent extends Component {
     render() {
         return (
             <Card className={this.props.className}>
-                    <CardHeader className="bg-danger">
-                        Transaction
+                <CardHeader className="bg-danger">
+                    Transaction
                     </CardHeader>
-                    <CardBody className="bg-dark d-flex flex-column stretch">
-                        <ButtonGroup className="m-2 d-flex-wrap mx-auto p-2 flex-wrap">
-                            {this.rendPlayerList()}
-                        </ButtonGroup>
-                        <ButtonGroup className=" d-flex flex-wrap">
-                            {this.rendAssetList()}
-                        </ButtonGroup>
-                        <ButtonGroup className="m-2 d-flex p-2 ">
-                            <Button className="align-self-stretch m-1 col" color="warning" name="action" value='req' onClick={this.onSetValue} active={this.state.action === 'req'}>Request</Button>
-                            <Button className="align-self-stretch m-1 col" color="danger" name="action" value='send' onClick={this.onSetValue} active={this.state.action === 'send'}>Send</Button>
-                        </ButtonGroup>
-                        <InputAmount className="m-2 d-flex" updateValue={this.onSetValue} amount={this.state.amount} this={this} />
-                        <Button className="p-2 mx-auto w-75" disabled={!(this.state.action && this.state.amount && this.state.asset && this.state.recipient)}>Process</Button>
-                    </CardBody>
-                </Card>
+                <CardBody className="bg-dark d-flex flex-column stretch">
+                    <ButtonGroup className="m-2 d-flex-wrap mx-auto p-2 flex-wrap">
+                        {this.rendPlayerList()}
+                    </ButtonGroup>
+                    <ButtonGroup className=" d-flex flex-wrap">
+                        {this.rendAssetList()}
+                    </ButtonGroup>
+                    <ButtonGroup className="m-2 d-flex p-2 ">
+                        <Button className="align-self-stretch m-1 col" color="warning" name="action" value='req' onClick={this.onSetValue} active={this.state.action === 'req'}>Request</Button>
+                        <Button className="align-self-stretch m-1 col" color="danger" name="action" value='send' onClick={this.onSetValue} active={this.state.action === 'send'}>Send</Button>
+                    </ButtonGroup>
+                    <InputAmount className="m-2 d-flex" updateValue={this.onSetValue} amount={this.state.amount} this={this} />
+                    <Button className="p-2 mx-auto w-75" disabled={!(this.state.action && this.state.amount && this.state.asset && this.state.recipient)}>Process</Button>
+                </CardBody>
+            </Card>
         )
     }
 
 };
 
-export default memo(PlayerListComponent);
+export default TransactionComponent;
