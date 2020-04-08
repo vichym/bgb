@@ -5,14 +5,17 @@ import {
     Badge
 } from 'reactstrap';
 import logo from '../../Logo/BGB.png'
+import { Link } from 'react-router-dom';
 
 const TopBar = (props) => {
     return (
         <div id={props.id} className={props.className} >
             <Navbar className=" navbar-dark bg-dark">
                 <div className=" col col-12 col-md-8 d-flex justify-content-center justify-content-md-start align-items-center" >
-                    <Media width="60" className="rounded d-block mx-1 p-1" src={logo} />
+                    <a href="/">
+                    <Media width="60" className="rounded d-block mx-1 p-1" src={logo} /></a>
                     <h1 id="app-title">Chat APP</h1>
+                    
                 </div>
                 <div className=" col d-flex justify-content-center justify-content-md-end">
                     <h2><Badge className="justify-item-center ">Code : {props.gameCode}</Badge> </h2>
