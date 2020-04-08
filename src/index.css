@@ -17,4 +17,15 @@ input{
   text-align: center;
 } 
 
+#log-text{
+  font-family: 'Courier New', Courier, monospace;
+  size: 1rem;
+  text-align: center;
+}
+#log-div{
+  scroll-behavior: smooth;
+  overflow: scroll;
+  max-height: auto;
+  min-height: auto; 
 
+}
