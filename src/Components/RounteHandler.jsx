@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { Route, Switch } from 'react-router-dom'
-import LoginPage from "../Components/LoginPage"
-import NotFoundPage from "../Components/404";
-import WelcomePage from '../Components/WelcomePage';
-import JoinGamePage from '../Components/JoinGamePage';
-import CreateGamePage from '../Components/CreateGamePage';
-import DashboardPage from '../Components/DashboardPage/DashboardPage';
+import LoginPage from "./LoginPage"
+import NotFoundPage from "./404";
+import WelcomePage from './WelcomePage';
+import JoinGamePage from './JoinGamePage/JoinGamePage';
+import CreateGamePage from './CreateGamePage';
+import DashboardPage from './DashboardPage/DashboardPage';
 
 export const route = [ 
     { path: '/', exact: true, Component: LoginPage, name: "Login Page" },
