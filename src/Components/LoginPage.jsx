@@ -3,7 +3,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Input, Row, Col } from 'reactstrap';
-import Layout from '../Layout/Layout'
+import Layout from './Layout'
 import { Link } from 'react-router-dom'; import Context from '../Context';
 
 const LoginPageWithoutContext = (props) => {

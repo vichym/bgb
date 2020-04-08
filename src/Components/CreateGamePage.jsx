@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import Layout from '../Layout/Layout';
+import Layout from './Layout';
 import { Button, Row, Col, Input, FormText } from 'reactstrap';
 import { Form, FormGroup, Label } from 'reactstrap';
 
@@ -8,9 +8,12 @@ class CreateGamePage extends Component {
         assetCount: 1
     }
 
+
     addAssetItem = () => {
         this.setState({ assetCount: this.state.assetCount + 1 })
     }
+
+
 
     renderAssetItem = () => {
         const items = []
