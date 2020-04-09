@@ -1,40 +1,76 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component} from 'react';
 import Layout from './Layout';
-import { Button, Row, Col, Input, FormText } from 'reactstrap';
-import { Form, FormGroup, Label } from 'reactstrap';
+import { Button, Row, Col, Input } from 'reactstrap';
+import { Form, FormGroup, Label, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import socket from '../socket'
+import Context from '../Context';
 
-class CreateGamePage extends Component {
+
+class CreateGamePageWithoutContext extends Component {
     state = {
-        assetCount: 1
+        assetNames: [],
+        assets: {},
+        nameHolder: ""
+    }
+    /* General on change handler for game name input, asset name input */
+    onChange = (e) => {
+        this.setState({ [e.target.name]: e.target.value })
     }
 
+    /* Take the name and value of asset frin Inpit and add it to Assets */
+    onAssetValueChange = (e) => {
+        /* Extract value from Input */
+        let name = e.target.name
+        let value = e.target.value
 
-    addAssetItem = () => {
-        this.setState({ assetCount: this.state.assetCount + 1 })
+        /* Update element in Set */
+        this.setState(prevState => ({
+            assets: {
+                ...prevState.assets,    
+                [name] : value    
+            }
+        }))
     }
 
+    /* update the name of asset and put in in a placeholder, only add complete name to array after submit  */
+    onAddAssetChange = (e) => {
+        this.setState({ nameHolder: e.target.value })
+    }
+
+    /* Add complete newly added name to assetNames array from rendering */
+    handleAddAssetItem = () => {
+        this.setState({ assetNames: [...this.state.assetNames, this.state.nameHolder] })
+        this.setState({ nameHolder: "" })
+    }
+
+    /*  */
+    handleSubmit = () => {
+        socket.emit("create_game", ({
+            username: this.props.context.app.state.username,
+            gameName: this.state.gameName,
+            assets: this.state.assets
+        }))
+        socket.on("create_game_success", res =>  console.log(res))
+    }
 
 
     renderAssetItem = () => {
         const items = []
-        for (var i = 0; i < this.state.assetCount; i++) {
+        this.state.assetNames.forEach(asset => {
             items.push(
                 <FormGroup row>
-                    <Col >
-                        <Input type="text" name="asset" id="asset" placeholder="Name" />
+                    <Col>
+                        <InputGroup>
+                            <InputGroupAddon addonType="prepend" name={asset}>
+                                <InputGroupText>{asset}</InputGroupText>
+                            </InputGroupAddon>
+                            <Input placeholder="Enter Initial Amount" type="number" name={asset} onChange={this.onAssetValueChange} />
+                        </InputGroup>
                     </Col>
-                    <FormText>:</FormText>
-                    <Col >
-                        <Input type="text" name="assentAmount" id="assentAmount" placeholder="Amount" />
-                    </Col>
-                </FormGroup>
-            )
-        }
-        return (
-            <Fragment>
-                {items}
-            </Fragment>
-        )
+                </FormGroup>)
+        })
+
+        return (items)
     }
 
     render() {
@@ -42,7 +78,10 @@ class CreateGamePage extends Component {
             <Layout color1='rgba(125, 238, 242, 1)' color2='rgb(0, 238, 99)' classNames='col-10 col-sm-10 col-md-8 col-lg-8 col-xl-6 ' >
                 <Row>
                     <Col>
-                        <h3 className="d-flex justify-content-center align-center" style={{ fontSize: '1.5rem' }}>Game Information</h3>
+                        <h3 className="d-flex justify-content-center align-center"
+                            style={{ fontSize: '1.5rem' }}>
+                            Game Information
+                        </h3>
                     </Col>
                 </Row>
                 <Form>
@@ -56,37 +95,38 @@ class CreateGamePage extends Component {
                                         name="gameName"
                                         id="gameName"
                                         placeholder="Game Name"
+                                        onChange={this.onChange}
                                     />
-                                </FormGroup>
-                                <FormGroup col>
-                                    <Label for="numberPlayers">Max. Players</Label>
-                                    <Input type="select" name="numberPlayers" id="numberPlayers">
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                        <option>6</option>
-                                        <option>7</option>
-                                        <option>8</option>
-                                    </Input>
                                 </FormGroup>
                             </Row>
                         </Col>
                         <Col sm >
-                             <Label >Asset</Label>
+                            <Label >Asset</Label>
                             {this.renderAssetItem()}
-                            <Button onClick={this.addAssetItem}> Add Asset </Button>
+                            <InputGroup>
+                                <Input placeholder="Enter Asset name here" value={this.state.nameHolder} onChange={this.onAddAssetChange} />
+                                <InputGroupAddon addonType="append">
+                                    <Button color="success" onClick={this.handleAddAssetItem}>Enter</Button>
+                                </InputGroupAddon>
+                            </InputGroup>
+
                         </Col>
                     </Row>
                 </Form>
                 <Row className="pt-3">
                     <Col className="mx-auto col-12 col-sm-10 col-md-8 col-lg-5 col-xl-5 ">
-                        <Button className="w-100" style={{ background: 'rgba(61, 180, 255, 1)', border: 0 }} to="/gamerooms">Create</Button>
+                        <Button className="w-100" onClick={this.handleSubmit} style={{ background: 'rgba(61, 180, 255, 1)', border: 0 }}>Create</Button>
                     </Col>
                 </Row>
-            </Layout>
-        );
+            </Layout >
+        )
     }
 }
 
-export default CreateGamePage;
+
+const CreateGamePage = () => 
+    <Context.Consumer>{
+        context => <CreateGamePageWithoutContext context = {context}/>
+    }</Context.Consumer>
+    ;
+export default CreateGamePage; 
