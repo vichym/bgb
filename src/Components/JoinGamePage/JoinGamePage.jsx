@@ -35,7 +35,10 @@ const JoinGamePageWithoutContext = (props) => {
                 "Content-Type": "application/json"
             },
             crossdomain: true,
-            params: { "gameCode": gameCode }
+            params: {
+                "username":username,
+                "gameCode": gameCode
+            }
         })
             .catch(
                 /* Check for Error */
@@ -44,19 +47,8 @@ const JoinGamePageWithoutContext = (props) => {
                 /* redirct page to Dashboard or show error modal  */
                 res => {
                     /* if the game is found */
-                    if (res.data.isFound) {
-                        /* SOCKET: emit "new_client" */
-                        socket.emit("join_game", { username, gameCode })
-                        socket.on("join_game_resp", ({ message, success }) => {
-                            if (success) {
-                                /* redirect to Dashbaord */
-                                history.push("/dashboard");
-                            } else {
-                                /* Show error join error modal */
-                                console.log(message)
-                                setJoinErrorModal(true)
-                            }
-                        })
+                    if (res.data) {
+                            history.push("/dashboard")
                     }
                     /* If game not found */
                     else {
