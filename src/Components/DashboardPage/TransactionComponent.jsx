@@ -39,16 +39,16 @@ class TransactionComponent extends Component {
 
     /* Generate Assets buttons */
     rendAssetList = () => {
-        let asset = this.props.asset
+        let assets = this.props.assets
         const items = []
-        asset.map(p =>
+        assets.map(p =>
             items.push(
                 <Button color="warning "
                     className="m-1 border border-danger rounded"
-                    name="asset"
+                    name="assets"
                     value={p.name}
                     onClick={this.onSetValue}
-                    active={this.state.asset === p.name}>
+                    active={this.state.assets === p.name}>
                     {p.name}
                 </Button>
             )
@@ -73,7 +73,7 @@ class TransactionComponent extends Component {
                         <Button className="align-self-stretch m-1 col" color="danger" name="action" value='send' onClick={this.onSetValue} active={this.state.action === 'send'}>Send</Button>
                     </ButtonGroup>
                     <InputAmount className="m-2 d-flex" updateValue={this.onSetValue} amount={this.state.amount} this={this} />
-                    <Button className="p-2 mx-auto w-75" disabled={!(this.state.action && this.state.amount && this.state.asset && this.state.recipient)}>Process</Button>
+                    <Button className="p-2 mx-auto w-75" disabled={!(this.state.action && this.state.amount && this.state.assets && this.state.recipient)}>Process</Button>
                 </CardBody>
             </Card>
         )

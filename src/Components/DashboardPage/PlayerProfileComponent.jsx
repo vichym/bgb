@@ -6,10 +6,10 @@ const PlayerProfileComponent = (props) => {
     const items = []
 
     /* Extract asset and username from props */
-    const { asset, username } = props
+    const { assets, username } = props
 
-    /* Generate List item of asset */
-    asset.map(a =>
+    /* Generate List item of assets */
+    assets.map(a =>
         items.push(
             <ListGroupItem className="justify-content-between d-flex align-items-center">
                 <h6>{a.name}</h6>
