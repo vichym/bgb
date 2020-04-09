@@ -14,6 +14,7 @@ const CLIENT_DOMIN = "http://localhost:3000"
 
 /*  Api for checking if a game with Code exists in Database */
 
+
 /* Enable CORS as middleware */
 app.use(cors())
 
@@ -23,17 +24,6 @@ var corsOptions = {
     optionsSuccessStatus: 200
 }
 
-app.get('/', cors(corsOptions), (req, res) => {
-    /* TODO: Check database for give with given code */
-    /* 
-    
-    
-    
-    
-    
-    */
-    return res.send({ code: req.query, message: true });
-});
 
 /* Run server to listen to PORT */
 server.listen(PORT, () => {
@@ -41,98 +31,133 @@ server.listen(PORT, () => {
 });
 
 
-/* Set up mongodb */
-mongodb.connect(`mongodb://${DOMAIN}:27017`, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-}, (err, client) => {
-    if (err) {
-        throw err
-    }
-    console.log('Mongodb connected')
+/*====================================== Set up mongodb ============================================*/
+mongodb.connect(`mongodb://${DOMAIN}:27017/`,
+    {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+    },
+    async (err, client) => {
+
+        /* Catch error if ther is an error */
+        if (err) throw err
+
+        /* get collection from database */
+        let Room_Collection = client.db("BGB").collection("Room_Collection")
 
 
-    /* get collection from database */
-    let Chat_Collection = client.db('chatapp').collection("Chat_Collection")
-    let Client_Collention = client.db('chatapp').collection("Clients")
 
-    /* Set up socket connection */
-    io.on('connection', socket => {
-        var socketId = socket.id
-        console.log('a user connected', socketId);
+        /* ============================================= Set up socket connection =========================*/
+        io.on('connection', socket => {
+            var socketId = socket.id
+            var socketRoom = socket.rooms
+            var socketUsername = ""
 
-        /* Handle new client event */
-        socket.on("new_client", (new_client) => {
-            /* Add socket ID to client */
+            console.log('a user connected', socketId);
 
-        })
+            /* API : for checking if game code if yes, send game data and socket emit to proceeed*/
+            /*-----------------------  Done : Check database for give with given code . -------------------------- */
+            app.get('/', cors(corsOptions), (req, res) => {
 
-        /* Handle join game room event */
-        socket.on("join_game", ({ username, gameCode }) => {
+                Room_Collection.find({ gameCode: req.query.gameCode }).limit(1).toArray((err, data) => {
+                    /* If ther is any error */
+                    if (err) {
+                        console.error(err)
+                    }
+                    else {
+                        /* If game exists */
+                        if (data[0]) {
+                            /* ------- Socket: (COMPLETED) Add user to chat room ---- */
+                            socketRoom = req.query.gameCode
+                            socketUsername = req.query.username
+                            socket.join(socketRoom,
+                                message(`${socketUsername} has joined ${socketRoom} room`, socketRoom)
+                            )
 
-            console.log(`${username} : ${gameCode}`)
+                            /*-------- COMPLETED : Add player to the game -----------*/
+                            Room_Collection.findOneAndUpdate({ gameCode: socketRoom }, {
+                                $addToSet: {
+                                    players: {
+                                        "username": socketUsername,
+                                        "assets": data[0].assets
+                                    },
+                                    logs: `${socketUsername} has joined the room.`
+                                }
+                            }, { returnNewDocument: true }, (err, data) => {
+                                if (err) throw err
+                                else {
+                                    /* emit fetched data to frontend through socket */
+                                    socket.emit("init_game_data", ({ data }))
+                                }
+                            });
+                            /* ---------------------------------------------------- */
+                        }
+                        return res.send(data[0]);
+                    }
+                })
+            });
+            /*---------------------------------------------------------------------------------------*/
 
-            /* Datebase: Look for game room with incoming code*/
-            /* TODO: code here for database look up
-            
-            
-            */
-
-            /* If game found */
-            if (true) {
-                /*  */
-                socket.emit("join_game_success", { message: "Joined game Success" })
+            /* For emitting message to a room*/
+            const message = (msg, room) => {
+                io.to(room).emit("message", { message: msg })
             }
-            /* Not found */
-            else {
-                socket.emit("join_game_fail", { message: "Joined game fail" })
-            }
-            /* Socket: Add user to chat room */
-        }
-        )
-
-        /* Handle leave room event */
-        socket.on("leave_room", (room) => {
-            /* Socket: Add user to chat room */
-            socket.leave(room)
-            console.log(`${socketId} leaves ${room}`)
-        })
-
-        /* Handle message input event */
-        socket.on("message", ((message, room) => {
-            if (message !== "" && room !== undefined) {
-                socket.to(room).emit("message", message)
-            }
-        }))
 
 
-        /* Handle client disconnect event */
-        socket.on("disconnect", (socket) => {
-            console.log(`${socketId} disconnected`)
-        })
 
-        /* Handle join room event */
-        socket.on("join_room", (room) => {
-            /* Socket: Add user to chat room */
-            socket.join(room)
-            console.log(`${socketId} join ${room}`)
-        })
+            /* -------------------------------------Handle Create Game event------------------------------- */
+            socket.on("create_game", ({ username, gameName, assets }) => {
 
-        /* Handle leave room event */
-        socket.on("leave_room", (room) => {
-            /* Socket: Add user to chat room */
-            socket.leave(room)
-            console.log(`${socketId} leaves ${room}`)
-        })
-
-        /* Handle message input event */
-        socket.on("message", ((message, room) => {
-            if (message !== "" && room !== undefined) {
-                socket.to(room).emit("message", message)
-            }
-        }))
-
-    });
-})
+                /* send game data through socket to frontend */
 
 
+                /* Generate game code */
+                const gameCode = generateCode()
+
+                /* Input data into database */
+                Room_Collection.insertOne({
+                    "gameCode": gameCode,
+                    "gameName": gameName,
+                    "players": [
+                        {
+                            username: username,
+                            assets: assets
+                        }
+                    ],
+                    "logs": [`${username} joined the room.`],
+                    "assets": assets,
+                })
+                    .catch(err => console.error(err))
+                    .then(console.log(Room_Collection.find()))
+                    .then(socket.emit("create_game_success"))
+            })
+
+
+            /* --------------------------------------Handle client disconnect event---------------------------- */
+            socket.on("disconnect", (socket) => {
+                message(`${socketId} left the room`, socketRoom)
+                console.log(`${socketUsername} left ${socketRoom}`)
+            })
+        });
+    })
+
+
+const generateCode = () => {
+    let code = Date.parse(new Date().getUTCMilliseconds()).toString().substr(1, 6)
+    return code
+}
+
+const data = {
+    players: [
+        { name: "Jonh" },
+        { name: "Jackinson" },
+    ],
+    asset: [
+        { name: "Gold", amount: 1000 },
+        { name: "Silver", amount: 600 },
+        { name: "Gold", amount: 1000 },
+    ],
+    log: [
+        { message: "Welcome!" }
+    ]
+}
