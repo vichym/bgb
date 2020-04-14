@@ -22,15 +22,15 @@ class TransactionComponent extends Component {
     rendPlayerList = () => {
         let players = this.props.players
         const items = []
-        players.map(p =>
+        players.map(name =>
             items.push(
                 <Button color="primary"
-                    className="border border-success rounded p-1"
+                    className="border m-1 border-success flex-grow-1 rounded p-1"
                     name="recipient"
-                    value={p.name}
+                    value={name}
                     onClick={this.onSetValue}
-                    active={this.state.recipient === p.name}>
-                    {p.name}
+                    active={this.state.recipient === name}>
+                    {name}
                 </Button>
             )
         )
@@ -41,18 +41,18 @@ class TransactionComponent extends Component {
     rendAssetList = () => {
         let assets = this.props.assets
         const items = []
-        assets.map(p =>
+        for (var key in assets) {
             items.push(
                 <Button color="warning "
                     className="m-1 border border-danger rounded"
                     name="assets"
-                    value={p.name}
+                    value={key}
                     onClick={this.onSetValue}
-                    active={this.state.assets === p.name}>
-                    {p.name}
+                    active={this.state.assets === key}>
+                    {key}
                 </Button>
             )
-        )
+        }
         return items
     }
     render() {
@@ -61,8 +61,8 @@ class TransactionComponent extends Component {
                 <CardHeader className="bg-danger">
                     Transaction
                     </CardHeader>
-                <CardBody className="bg-dark d-flex flex-column stretch">
-                    <ButtonGroup className="m-2 d-flex-wrap mx-auto p-2 flex-wrap">
+                <CardBody className="bg-dark d-flex flex-column">
+                    <ButtonGroup className="m-2 d-flex mx-auto p-2  flex-wrap">
                         {this.rendPlayerList()}
                     </ButtonGroup>
                     <ButtonGroup className=" d-flex flex-wrap">
