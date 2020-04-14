@@ -6,45 +6,50 @@ import PlayerProfileComponent from './PlayerProfileComponent';
 import TransactionComponent from './TransactionComponent';
 import Log from './Log';
 import socket from '../../socket'
+import {withRouter} from 'react-router-dom'
+
 class DashboardPageWithoutContect extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {
-            players: [],
-            asset: [],
-            log: []
-        }
+        this.state = this.props.location.state
     }
-
+    /*
+     */
     componentDidMount() {
-        socket.on("init_game_data",
-            ({ message, data }) => {
-                this.setState({ asset: data.asset, players: data.players, log: data.log })
-                console.log("Socket.on init_game_data")
+        /* Update player_list when a new player join */
+        socket.on("update_player_list",
+            ({ player_list , logs}) => {
+                this.setState({
+                    player_list: player_list,
+                    logs:logs
+                })
+                console.log("Updated player_list", this.state.player_list)
+                console.log("Updated logs", this.state.logs)
             })
-        socket.on("message", (message) => {
-            this.setState({ log: [...this.state.log, message] })
+        socket.on("logs", (message) => {
+            this.setState({ logs: [...this.state.logs, message] })
         })
 
     }
 
+
     render() {
-        const { username, gameCode } = this.props.context.app.state
+        const { username } = this.props.context.app.state
         return (
             <div className="vh-100 bg-primary">
-                <TopBar gameCode={gameCode} />
+                <TopBar gameCode={this.state.gameCode} />
                 <Container fluid>
                     <Row className=" justify-content-center d-flex">
                         <Col className=" col-12 col-md-5 p-1 align-items-stretch justify-content-center">
-                            <PlayerProfileComponent className="m-1 align-items-stretch" asset={this.state.asset} username={username} />
+                            <PlayerProfileComponent className="m-1 align-items-stretch"  username = {username} assets={this.state[username]} />
                         </Col>
                         <Col className=" col-12 col-md-7 p-1 justify-content-center">
-                            <TransactionComponent className="m-1" players={this.state.players} asset={this.state.asset} />
-                            <Log className="m-1" log={this.state.log} />
+                            <TransactionComponent className="m-1" players={this.state.player_list} assets={this.state.assets} />
+                            <Log className="m-1" logs={this.state.logs} />
                         </Col>
                     </Row>
-                    
+
                 </Container>
 
             </div>
@@ -53,16 +58,15 @@ class DashboardPageWithoutContect extends Component {
 }
 
 
-const DashboardPage = () => {
+const DashboardPage = (props) => {
     return (
         /* Utilize context value assigned in App.js */
         <Context.Consumer>
             {(value) =>
-                <DashboardPageWithoutContect context={value} />
+                <DashboardPageWithoutContect location={props.location} context={value} />
             }
         </Context.Consumer>
     );
 };
 
-export default DashboardPage;
-
+export default withRouter(DashboardPage);
