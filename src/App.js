@@ -1,24 +1,29 @@
 import React, { Fragment, Component } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Context from './Context'
-import socket from './socket'
-import RouteHandler from './Layout/RounteHandler';
-
+import RouteHandler from './Components/RounteHandler';
 
 class App extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      username: "",
-      gameCode: "",
+      username: ""
     }
   }
-  componentWillMount() {
-    socket.on("join_game_success", ({ message }) => {
-      this.setState({ joinStatus: true })
-      console.log("join_game_success")
-    })
+
+  componentDidMount() {
+    /* Add event listener for reload page event */
+    window.addEventListener('beforeunload', this.handleReloadPage);
+  }
+
+  componentWillUnmount() {
+    /* Add event listener for reload page event */
+    window.removeEventListener('beforeunload', this.handleReloadPage);
+  }
+
+  handleReloadPage(e) {
+    
   }
 
   render() {
