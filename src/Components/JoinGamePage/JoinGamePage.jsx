@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import Layout from '../Layout';
 import { Button, Row, Col, Input } from 'reactstrap';
 import Context from '../../Context';
-import socket, { url } from '../../socket'
+import { url } from '../../socket'
 import axios from 'axios'
-import { useHistory } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import InfoModal from './Modal';
-
 
 const JoinGamePageWithoutContext = (props) => {
 
@@ -14,8 +13,6 @@ const JoinGamePageWithoutContext = (props) => {
     const { app } = props.context
     const { gameCode, username } = app.state
 
-    /* Initialize history for redirecting route */
-    const history = useHistory()
 
     const [codeErrorModal, setCodeErrorModal] = useState(false);
     const [joinErrorModal, setJoinErrorModal] = useState(false);
@@ -30,13 +27,13 @@ const JoinGamePageWithoutContext = (props) => {
     const handleSubmit = async () => {
         axios({
             method: "GET",
-            url: url,
+            url: url + "/api/joingame",
             headers: {
                 "Content-Type": "application/json"
             },
             crossdomain: true,
             params: {
-                "username":username,
+                "username": username,
                 "gameCode": gameCode
             }
         })
@@ -48,7 +45,11 @@ const JoinGamePageWithoutContext = (props) => {
                 res => {
                     /* if the game is found */
                     if (res.data) {
-                            history.push("/dashboard")
+                        /* Redirect to Dashboard.js and pass game data as props*/
+                        props.history.push({
+                            pathname: '/dashboard',
+                            state: res.data  //String size limit of 640k characters. res.data here is already data of the game!
+                        })
                     }
                     /* If game not found */
                     else {
@@ -91,14 +92,14 @@ const JoinGamePageWithoutContext = (props) => {
     );
 }
 
-const JoinGamePage = () => {
+const JoinGamePage = (props) => {
     return (
         <Context.Consumer>
             {value =>
-                <JoinGamePageWithoutContext context={value} />
+                <JoinGamePageWithoutContext history={props.history} context={value} />
             }
         </Context.Consumer>
     )
 }
 
-export default JoinGamePage;
+export default withRouter(JoinGamePage);

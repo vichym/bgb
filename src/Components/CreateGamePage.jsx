@@ -1,11 +1,11 @@
-import React, { Component} from 'react';
+import React, { Component } from 'react';
 import Layout from './Layout';
 import { Button, Row, Col, Input } from 'reactstrap';
 import { Form, FormGroup, Label, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import socket from '../socket'
+import { url } from '../socket'
 import Context from '../Context';
-
-
+import axios from "axios"
+import { Redirect , withRouter} from "react-router-dom"
 class CreateGamePageWithoutContext extends Component {
     state = {
         assetNames: [],
@@ -26,8 +26,8 @@ class CreateGamePageWithoutContext extends Component {
         /* Update element in Set */
         this.setState(prevState => ({
             assets: {
-                ...prevState.assets,    
-                [name] : value    
+                ...prevState.assets,
+                [name]: value
             }
         }))
     }
@@ -45,12 +45,40 @@ class CreateGamePageWithoutContext extends Component {
 
     /*  */
     handleSubmit = () => {
-        socket.emit("create_game", ({
-            username: this.props.context.app.state.username,
-            gameName: this.state.gameName,
-            assets: this.state.assets
-        }))
-        socket.on("create_game_success", res =>  console.log(res))
+        // socket.emit("create_game", ({
+        //     username: this.props.context.app.state.username,
+        //     gameName: this.state.gameName,
+        //     assets: this.state.assets
+        // }))
+        // socket.on("create_game_success", res =>  console.log(res))
+
+        axios({
+            method: "POST",
+            url: url + "/api/creategame",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            crossdomain: true,
+            data: {
+                username: this.props.context.app.state.username,
+                gameName: "DATA2",
+                assets: {
+                    asset1: "ASSET1",
+                    asset2: "ASSET2",
+                    asset3: "ASSET3",
+                }
+            }
+        })
+            .catch(
+                err => console.error(err))
+            .then(
+                res => {
+                    this.props.history.push({
+                        pathname: '/dashboard',
+                        state: res.data.ops[0]  // there is a string size limit of 640k characters that can be passed.
+                                                // So extract only data about game
+                    })
+                })
     }
 
 
@@ -123,10 +151,9 @@ class CreateGamePageWithoutContext extends Component {
     }
 }
 
-
-const CreateGamePage = () => 
+const CreateGamePage = (props) =>
     <Context.Consumer>{
-        context => <CreateGamePageWithoutContext context = {context}/>
+        context => <CreateGamePageWithoutContext history={props.history} context={context} />
     }</Context.Consumer>
     ;
-export default CreateGamePage; 
+export default withRouter(CreateGamePage); 
