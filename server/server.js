@@ -24,12 +24,10 @@ var corsOptions = {
     optionsSuccessStatus: 200
 }
 
-
 /* Run server to listen to PORT */
 server.listen(PORT, () => {
     console.log(`listening on Port:${PORT}`);
 });
-
 
 /*====================================== Set up mongodb ============================================*/
 mongodb.connect(`mongodb://${DOMAIN}:27017/`,
@@ -48,15 +46,14 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
         /* ============================================= Set up socket connection =========================*/
         io.on('connection', socket => {
             var socketId = socket.id
-            var socketRoom = socket.rooms
-            var socketUsername = ""
 
             console.log('a user connected', socketId);
 
-            /*-----------------------  Done : Handle Join Game . -------------------------- */
+            /*-----------------------  DONE : Handle Join Game . -------------------------- */
             /* API : for checking if game code if yes, send game data and socket emit to proceeed*/
             app.get('/api/joingame', cors(corsOptions), (req, res) => {
 
+                /* Look for game in the database */
                 Room_Collection.find({ gameCode: req.query.gameCode }).limit(1).toArray((err, data) => {
                     /* If ther is any error */
                     if (err) {
@@ -65,30 +62,31 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
                     else {
                         /* If game exists */
                         if (data[0]) {
-                            /* ------- Socket: (COMPLETED) Add user to chat room ---- */
-                            socketRoom = req.query.gameCode
-                            socketUsername = req.query.username
-                            socket.join(socketRoom,
-                                message(`${socketUsername} has joined ${socketRoom} room`, socketRoom)
-                            )
-
-                            /*-------- COMPLETED : Add player to the game -----------*/
-                            Room_Collection.findOneAndUpdate({ gameCode: socketRoom },
+                            /*---------------- DONE : Add player to the game -----------*/
+                            Room_Collection.findOneAndUpdate({ gameCode: req.query.gameCode },
                                 {
-                                    $addToSet: { logs: `${socketUsername} has joined the room.`, player_list: `${socketUsername}`},
-                                    $set:{ [socketUsername]: data[0].assets}
+                                    $addToSet: { logs: `${req.query.username} has joined the room.`, player_list: req.query.username },
+                                    $set: { [req.query.username]: data[0].assets }
                                 },
-                                { returnOriginal: false, upsert:true }, (err, data) => {
+                                { returnOriginal: false, upsert: true }, (err, data) => {
                                     if (err) throw err
                                     else {
-                                        /* emit fetched data to frontend through socket */
-                                        socket.emit("init_game_data", ( data.value ))
+                                        /* Socket: (DONE) Add user to chat room*/
+                                        socket.join(req.query.gameCode, console.log(socket.rooms))
+                                        /* Send new player array to other players */
+                                        io.to(req.query.gameCode).emit("update_player_list", { logs: data.value.logs, player_list: data.value.player_list })
+                                        /* Send new game data to frontend */
+                                        console.log(data.value)
+                                        res.send(data.value)
                                     }
-                            });
-                            
+                                });
                             /* ---------------------------------------------------- */
                         }
-                        return res.send(data[0]);
+                        /* If Game does not exist */
+                        else {
+                            /* Send false flag to frontend */
+                            res.send(false);
+                        }
                     }
                 })
             });
@@ -96,33 +94,39 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
 
             /* For emitting message to a room*/
             const message = (msg, room) => {
-                io.to(room).emit("message", { message: msg })
+                io.to(room).emit("logs", { message: msg })
             }
-            
-            /* -------------------------------------Handle Create Game event------------------------------- */
-            app.post("/api/creategame", cors(corsOptions), (req, res) => {
-                const gameCode = generateCode()
-                console.log("api/creategame")
+
+            /* ------------------------------------- DONE: Handle Create Game event------------------------------- */
+            app.post('/api/creategame', cors(corsOptions), (req, res) => {
+                /* Generate Game Code */
+                let gameCode = generateCode()
+
+                /* Add game object to database */
                 Room_Collection.insertOne({
                     "gameCode": gameCode,
                     "gameName": req.body.gameName,
-                    [req.body.username]: req.body.assets, 
+                    [req.body.username]: req.body.assets,
                     "logs": [`${req.body.username} joined the room.`],
                     "assets": req.body.assets,
                     "player_list": [`${req.body.username} `]
                 })
-                    .catch(err => { return res.send(err) })
-                    .then(resp => {
-                        return res.send(resp)
-                    })      
-            } )
-            
+                    .catch(
+                        /* Catch Error*/
+                        err => console.log(err))
+                    .then((
+                        resp => {
+                            /* Socket: (DONE) Add user to chat room*/
+                            socket.join(gameCode, console.log(socket.rooms))
 
+                            /* Send Response back to frontend */
+                            res.send(resp)
+                        }))
 
-            /* --------------------------------------Handle client disconnect event---------------------------- */
-            socket.on("disconnect", (socket) => {
-                message(`${socketId} left the room`, socketRoom)
-                console.log(`${socketUsername} left ${socketRoom}`)
+            })
+
+            socket.on("disconnect", () => {
+                console.log(`${socketId} disconnected`)
             })
         });
     })
@@ -133,20 +137,7 @@ const generateCode = () => {
     return code
 }
 
-const data = {
-    players: [
-        { name: "Jonh" },
-        { name: "Jackinson" },
-    ],
-    asset: [
-        { name: "Gold", amount: 1000 },
-        { name: "Silver", amount: 600 },
-        { name: "Gold", amount: 1000 },
-    ],
-    log: [
-        { message: "Welcome!" }
-    ]
-}
+
 
 
 // let ass = ""
