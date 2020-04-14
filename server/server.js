@@ -71,7 +71,7 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
                                 { returnOriginal: false, upsert: true }, (err, data) => {
                                     if (err) throw err
                                     else {
-                                        /* Socket: (DONE) Add user to chat room*/
+                                        /* Socket: (BUG) Add user to chat room. Use game code as room id*/
                                         socket.join(req.query.gameCode, console.log(socket.rooms))
                                         /* Send new player array to other players */
                                         io.to(req.query.gameCode).emit("update_player_list", { logs: data.value.logs, player_list: data.value.player_list })
@@ -116,7 +116,7 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
                         err => console.log(err))
                     .then((
                         resp => {
-                            /* Socket: (DONE) Add user to chat room*/
+                            /* Socket : (BUG) Add user to chat room. Use game code as room id*/
                             socket.join(gameCode, console.log(socket.rooms))
 
                             /* Send Response back to frontend */
