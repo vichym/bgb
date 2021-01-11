@@ -73,6 +73,7 @@ class CreateGamePageWithoutContext extends Component {
                 err => console.error(err))
             .then(
                 res => {
+                    console.log(res)
                     this.props.history.push({
                         pathname: '/dashboard',
                         state: res.data.ops[0]  // there is a string size limit of 640k characters that can be passed.

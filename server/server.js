@@ -35,7 +35,10 @@ mongodb.connect(`mongodb://${DOMAIN}:27017/`,
         useUnifiedTopology: true,
         useNewUrlParser: true,
     },
-    async (err, client) => {
+    (err, client) => {
+
+        /* Verify Mongo Connected */
+        console.log("Mongo Connected")
 
         /* Catch error if ther is an error */
         if (err) throw err

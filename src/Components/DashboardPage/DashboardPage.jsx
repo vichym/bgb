@@ -30,7 +30,6 @@ class DashboardPageWithoutContect extends Component {
         socket.on("logs", (message) => {
             this.setState({ logs: [...this.state.logs, message] })
         })
-
     }
 
 
